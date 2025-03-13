@@ -1,0 +1,39 @@
+' Macro for Excel suited for use with Canvas Catalog User Registration reporting
+' User Registration reports typically have a sparse field for User Defined Fields (UDFs) as users may belong to different subcatalogs.
+' This macro should remove the >200 unnecessary columns from the file
+
+Sub DeleteHyphenColumns()
+    Dim ws As Worksheet
+    Dim lastCol As Long
+    Dim col As Long
+    Dim allHyphens As Boolean
+    Dim rng As Range
+    Dim deletedColumns As Long
+    Dim i As Long
+
+    deletedColumns = 0
+
+    ' Loop through each worksheet in the workbook
+    For Each ws In ThisWorkbook.Worksheets
+        lastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+        ' Loop through each column from right to left
+        For col = lastCol To 1 Step -1
+            allHyphens = True
+            Set rng = ws.Columns(col).Cells
+            ' Check if the entire column contains only hyphens (excluding the header)
+            For i = 2 To ws.Cells(ws.Rows.Count, col).End(xlUp).Row
+                If ws.Cells(i, col).Value <> "-" Then
+                    allHyphens = False
+                    Exit For
+                End If
+            Next i
+            If allHyphens Then
+                rng.Delete
+                deletedColumns = deletedColumns + 1
+            End If
+        Next col
+    Next ws
+
+    ' Display confirmation message
+    MsgBox "Macro executed. " & deletedColumns & " columns deleted.", vbInformation
+End Sub
